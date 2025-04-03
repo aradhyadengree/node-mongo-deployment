@@ -13,13 +13,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install Terraform  # Fix: Install Terraform
+      - name: Install Terraform
         run: |
           sudo apt-get update -y
           sudo apt-get install -y wget unzip
-          wget https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
-          unzip terraform_1.5.0_linux_amd64.zip
-          sudo mv terraform /usr/local/bin/
+          wget https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip -O terraform.zip
+          rm -f /usr/local/bin/terraform  # Ensure old terraform binary is removed
+          unzip -o terraform.zip -d /usr/local/bin/  # Use `-o` to overwrite without prompt
           terraform --version  # Verify Terraform installation
 
       - name: Login to Docker Hub
