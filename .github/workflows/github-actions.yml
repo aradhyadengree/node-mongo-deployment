@@ -20,10 +20,13 @@ jobs:
       - name: Install Terraform
         run: |
           wget https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
-          sudo rm -rf /usr/local/bin/terraform || sudo rm -rf /usr/local/bin/terraform/ #Handle both file and directory cases
+          sudo rm -rf /usr/local/bin/terraform  # Remove old terraform (file or directory)
+          sudo rm -rf /usr/local/bin/terraform/ # Extra check in case it's a directory
+          sudo find /usr/local/bin -name "terraform" -exec rm -rf {} + # Ensure complete removal
           unzip -o terraform_1.5.0_linux_amd64.zip
           sudo mv terraform /usr/local/bin/
-          sudo chmod +x /usr/local/bin/terraform  #Ensure Terraform is executable
+          sudo chmod +x /usr/local/bin/terraform  # Make sure it's executable
+
 
           terraform --version
 
