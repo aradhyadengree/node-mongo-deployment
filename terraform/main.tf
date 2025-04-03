@@ -17,7 +17,7 @@ variable "aws_secret_key" {
 }
 
 resource "aws_security_group" "app_sg" {
-  name        = "app-security-group"
+  name        = "devops"
   description = "Allow traffic to backend and database"
 
   ingress {
