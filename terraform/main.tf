@@ -67,7 +67,7 @@ resource "aws_security_group" "app_sg" {
 resource "aws_instance" "app_server" {
   ami           = "ami-00a929b66ed6e0de6"  
   instance_type = "t2.micro"
-  key_name      = "your-key-pair"
+  key_name      = "mykey"
   security_groups = [aws_security_group.app_sg.name]
 
   user_data = <<-EOF
