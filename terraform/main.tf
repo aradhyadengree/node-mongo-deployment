@@ -1,7 +1,8 @@
 provider "aws" {
-  region = "us-east-1"
+  region     = "us-east-1"
+  access_key = "${AWS_ACCESS_KEY_ID}"
+  secret_key = "${AWS_SECRET_ACCESS_KEY}"
 }
-
 
 resource "aws_security_group" "app_sg" {
   name        = "app-security-group"
