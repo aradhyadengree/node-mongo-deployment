@@ -1,9 +1,10 @@
-name: Deploy App
+name: Deploy to AWS with Terraform
 
-on:
-  push:
-    branches:
-      - main
+on:  
+  push:  
+    branches:  
+      - main  # Runs on push to main branch
+  workflow_dispatch:  # Allows manual trigger from GitHub Actions UI
 
 jobs:
   build:
@@ -11,6 +12,15 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Install Terraform  # Fix: Install Terraform
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y wget unzip
+          wget https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
+          unzip terraform_1.5.0_linux_amd64.zip
+          sudo mv terraform /usr/local/bin/
+          terraform --version  # Verify Terraform installation
 
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
