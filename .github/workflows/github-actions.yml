@@ -19,13 +19,13 @@ jobs:
           terraform_version: 1.5.0
 
       - name: Initialize Terraform
-        run: |
-          cd terraform
-          terraform init
+        working-directory: terraform
+        run: terraform init
 
       - name: Apply Terraform Configuration
+        working-directory: terraform
         run: |
-          cd terraform
+          export TF_LOG=DEBUG  # Enable verbose logs for debugging
           terraform apply -auto-approve
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -33,8 +33,13 @@ jobs:
 
       - name: Wait for EC2 to be Ready
         run: |
-          echo "Waiting for EC2 to be accessible..."
-          sleep 60  # Adjust based on EC2 startup time
+          echo "Checking if EC2 instance is reachable..."
+          for i in {1..10}; do
+            nc -z -v -w3 ${{ secrets.SERVER_IP }} 22 && echo "EC2 is accessible!" && exit 0
+            echo "Waiting for EC2 to start... Retry #$i"
+            sleep 15
+          done
+          echo "EC2 instance is not responding. Exiting..." && exit 1
 
       - name: SSH into EC2 & Deploy Docker
         uses: appleboy/ssh-action@master
@@ -52,30 +57,30 @@ jobs:
               sudo systemctl start docker
               sudo systemctl enable docker
               sudo usermod -aG docker $USER
+              newgrp docker  # Apply group changes immediately
             fi
 
             echo "Installing Docker Compose (if missing)..."
-            if ! command -v docker-compose &> /dev/null; then
+            if ! command -v docker compose &> /dev/null; then
               sudo apt install docker-compose -y
             fi
 
             echo "Pulling latest code..."
-            if [ ! -d "/home/ec2-user/my-app" ]; then
-              git clone https://github.com/your-username/your-repo.git /home/ec2-user/my-app
+            APP_DIR="/home/ec2-user/my-app"
+            if [ ! -d "$APP_DIR" ]; then
+              git clone https://github.com/your-username/your-repo.git $APP_DIR
             else
-              cd /home/ec2-user/my-app
+              cd $APP_DIR
               git reset --hard
               git pull origin main
             fi
 
             echo "Deploying Application with Docker..."
-            cd /home/ec2-user/my-app
-            sudo docker-compose down
-            sudo docker-compose up -d --build
+            cd $APP_DIR
+            sudo docker compose down
+            sudo docker compose up -d --build
 
             echo "Deployment Completed!"
-
-
 
 
 
