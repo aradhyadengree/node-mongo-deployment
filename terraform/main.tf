@@ -1,7 +1,19 @@
 provider "aws" {
-  region     = "us-east-1"
-  access_key = "${AWS_ACCESS_KEY_ID}"
-  secret_key = "${AWS_SECRET_ACCESS_KEY}"
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
+  region     = "us-east-1" 
+}
+
+variable "aws_access_key" {
+  description = "AWS access key"
+  type        = string
+  sensitive   = true
+}
+
+variable "aws_secret_key" {
+  description = "AWS secret key"
+  type        = string
+  sensitive   = true
 }
 
 resource "aws_security_group" "app_sg" {

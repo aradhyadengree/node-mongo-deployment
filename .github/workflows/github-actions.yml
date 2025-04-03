@@ -21,7 +21,7 @@ jobs:
         run: |
           curl -O https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
 
-      - name: Terraform Installation
+      - name: Fix Terraform Installation
         run: |
           sudo rm -rf /usr/local/bin/terraform
           sudo mkdir -p /usr/local/bin
@@ -43,8 +43,118 @@ jobs:
         run: |
           cd terraform
           terraform init
+        shell: /usr/bin/bash -e {0}
 
       - name: Apply Terraform Configuration
         run: |
           cd terraform
-          terraform apply -auto-approve
+          terraform apply -auto-approve \
+            -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        shell: /usr/bin/bash -e {0}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# name: Terraform Deployment
+
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
+
+# jobs:
+#   terraform:
+#     name: Deploy Infrastructure
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v3
+
+#       - name: Download Terraform
+#         run: |
+#           curl -O https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
+
+#       - name: Terraform Installation
+#         run: |
+#           sudo rm -rf /usr/local/bin/terraform
+#           sudo mkdir -p /usr/local/bin
+#           sudo unzip -o terraform_1.5.0_linux_amd64.zip -d /usr/local/bin
+#           sudo chmod +x /usr/local/bin/terraform
+
+#       - name: Configure AWS Credentials
+#         run: |
+#           mkdir -p ~/.aws
+#           echo "[default]" > ~/.aws/credentials
+#           echo "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
+#           echo "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+#         env:
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#         shell: /usr/bin/bash -e {0}
+
+#       - name: Initialize Terraform
+#         run: |
+#           cd terraform
+#           terraform init
+
+#       - name: Apply Terraform Configuration
+#         run: |
+#           cd terraform
+#           terraform apply -auto-approve
